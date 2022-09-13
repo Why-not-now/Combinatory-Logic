@@ -16,7 +16,7 @@ V = BCT
 {int:0} = I
 <add> = C<apply><next>
 <apply> = Y(B(S(BB(BS<zero>)))(B(B(SB))(CB<prev>)))
-<next_pair> = S(B<pair><second>)(S(<add><first>)<second>)
+<next_pair> = S(B<pair><second>)(S(B<add><first>)<second>)
 <fib> = C(B<first>(C<apply><next_pair>))(<pair>{int:0}(<next>{int:0}))
 
-{int:3}
+<fib>{int:5}

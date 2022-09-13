@@ -301,10 +301,10 @@ def analyse(code, macros=[]):
         print()
         # if not a:
         #     break
-    while code:
-        code = expand(code)
-        print(code)
-        print()
+    # while code:
+    #     code = expand(code)
+    #     print(code)
+    #     print()
 
 
 def _main():
