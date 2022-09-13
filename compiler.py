@@ -83,8 +83,6 @@ _slash = re.compile(
 
 def calculate_init(var):
     def closure(string: re.Match):
-        print(var)
-        print(string.group())
         output = eval(
             _slash.sub(r'\1', string.group()[1:-1]).replace('<>', var), {}
         )
@@ -101,20 +99,14 @@ def _K(arg):
 
 
 def _B(arg):
-    print('B')
-    print(arg)
     return '{0}({1}{2})'.format(*arg)
 
 
 def _C(arg):
-    print('C')
-    print(arg)
     return '{0}{2}{1}'.format(*arg)
 
 
 def _S(arg):
-    print('S')
-    print(arg)
     return '{0}{2}({1}{2})'.format(*arg)
 
 
@@ -255,6 +247,8 @@ def step(code: str):
                     end += 1
                     arguments.append(code[start:end])
                 else:
+                    print(operator)
+                    print(arguments)
                     return code[:i] + _arguments[operator](arguments) + code[end:]
 
             bracket_flag = False
@@ -272,16 +266,45 @@ def step(code: str):
     return False
 
 
+def expand(code: str):
+    for i, operator in enumerate(code):
+        if operator == '{':  # complex macro
+            operator = _literal.match(code, i)
+            cls, instance = operator.group()[1:-1].split(':')
+            if instance in macro[cls]:
+                return f'{code[:i]}({macro[cls][instance]}){code[operator.end():]}'
+            definition: str = macro[cls]['']
+            instance = repr(eval(cls)(instance))
+            calculate = calculate_init(instance)
+            return f'{code[:i]}({_calculation.sub(calculate, definition)}){code[operator.end():]}'
+
+        if operator == '<' :
+            matched = _macro.match(code, i)
+            if (operator := matched.group()) in macro:  # multiletter macro
+                return f'{code[:i]}({macro[operator]}){code[matched.end():]}'
+
+        if operator.isupper():
+            if operator in macro:  # macro
+                return f'{code[:i]}({macro[operator]}){code[i + 1:]}'
+    return False
+
+
 def analyse(code, macros=[]):
     '''analyse completely'''
     initialise(code, macros)
-    while code:
+    a = code
+    while a:
     # for x in range(300):
-        code = step(code)
+        code = a
+        a = step(code)
+        print(a)
+        print()
+        # if not a:
+        #     break
+    while code:
+        code = expand(code)
         print(code)
         print()
-        # if not code:
-        #     break
 
 
 def _main():
