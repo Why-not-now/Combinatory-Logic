@@ -1,6 +1,7 @@
 # Combinatory Logic Program (.CLP)
 
 CLP is a Python program that will step through the code
+<https://www.youtube.com/watch?v=gnrSedVucXs>
 
 <!-- ## Installation -->
 
