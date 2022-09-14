@@ -79,6 +79,9 @@ _field = re.compile(
 _slash = re.compile(
     r'(\\.)'
 )
+_useless_identity = re.compile(
+    r'\(I\)'
+)
 
 
 def calculate_init(var):
@@ -193,9 +196,7 @@ def step(code: str):
                     elif y == ')':
                         brackets -= 1
                     if brackets == 0:
-                        end = index
-                        break
-                return code[:i] + code[i + 1:end] + code[end + 1:]
+                        return code[:i] + code[i + 1:index] + code[index + 1:]
 
             if operator == '{':  # complex macro
                 operator = _literal.match(code, i)
@@ -247,8 +248,8 @@ def step(code: str):
                     end += 1
                     arguments.append(code[start:end])
                 else:
-                    print(operator)
-                    print(arguments)
+                    # print(operator)
+                    # print(arguments)
                     return code[:i] + _arguments[operator](arguments) + code[end:]
 
             bracket_flag = False
@@ -263,10 +264,8 @@ def step(code: str):
                     if brackets == 0:
                         bracket_flag = index
                         break
-    return False
 
-
-def expand(code: str):
+    bracket_flag = True
     for i, operator in enumerate(code):
         if operator == '{':  # complex macro
             operator = _literal.match(code, i)
@@ -286,6 +285,25 @@ def expand(code: str):
         if operator.isupper():
             if operator in macro:  # macro
                 return f'{code[:i]}({macro[operator]}){code[i + 1:]}'
+
+        if operator == '(':  # brackets
+            if bracket_flag:
+                brackets = 1
+                for index, y in enumerate(code[i + 1:], i + 1):
+                    if y == '(':
+                        brackets += 1
+                    elif y == ')':
+                        brackets -= 1
+                    if brackets == 0:
+                        return code[:i] + code[i + 1:index] + code[index + 1:]
+            else:
+                bracket_flag = True
+
+        else:
+            bracket_flag = False
+        
+    if _useless_identity.search(code):
+        return _useless_identity.sub(r'I', code)
     return False
 
 
@@ -301,10 +319,6 @@ def analyse(code, macros=[]):
         print()
         # if not a:
         #     break
-    # while code:
-    #     code = expand(code)
-    #     print(code)
-    #     print()
 
 
 def _main():
