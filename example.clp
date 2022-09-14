@@ -19,4 +19,4 @@ V = BCT
 <next_pair> = S(B<pair><second>)(S(B<add><first>)<second>)
 <fib> = B<first>(C(C<apply><next_pair>)(<pair>{int:0}(<next>{int:0})))
 
-<fib>{int:7}
+{int:5}
